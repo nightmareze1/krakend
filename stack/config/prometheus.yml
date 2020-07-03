@@ -1,0 +1,49 @@
+# my global config
+global:
+  scrape_interval:     5s # By default, scrape targets every 15 seconds.
+  evaluation_interval: 5s # By default, scrape targets every 15 seconds.
+  # scrape_timeout is set to the global default (10s).
+
+  # Attach these labels to any time series or alerts when communicating with
+  # external systems (federation, remote storage, Alertmanager).
+  external_labels:
+      monitor: 'codelab-monitor'
+
+# Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
+rule_files:
+  # - "first.rules"
+  # - "second.rules"
+
+# A scrape configuration containing exactly one endpoint to scrape:
+# Here it's Prometheus itself.
+scrape_configs:
+  - job_name: 'traefik-endpoint'
+    static_configs:
+    - targets: ['172.40.0.10:8080']
+
+  - job_name: 'krakend'
+    static_configs:
+    - targets: ['172.40.0.5:9091']
+
+#    metric_relabel_configs:
+#    - source_labels: [__name__]
+#      regex: '(traefik_backend_server_up)' #This line delete unnecesary metric example
+#      action: drop
+#    - source_labels: [__name__, code] 
+#      separator: ';' 
+#      regex: 'traefik_backend_requests_total;(200);(404)'  # Permitir metricas indicadas
+#      action: replace 
+#      target_label: __tmp_keep 
+#      replacement: 1 
+#    - source_labels: [__name__, __tmp_keep] 
+#      separator: ';' 
+#      regex: 'traefik_backend_requests_total;$' 
+#      action: drop 
+
+
+# Uncomment for use default metrics 
+ 
+# - job_name: 'prometheus'
+#    scrape_interval: 5s
+#    static_configs:
+#      - targets: ['localhost:9090']

@@ -1,0 +1,30 @@
+InsecureSkipVerify = true
+defaultEntryPoints = ["http", "https"]
+[entryPoints]
+  [entryPoints.http]
+  address = ":80"
+  [entryPoints.https]
+  address = ":443"
+
+# Set up logging.
+traefikLogsFile = "/opt/traefik/traefik-stdout.log"
+accessLogsFile = "/opt/traefik/traefik-stdout.log"
+logLevel = "INFO"
+
+[web.auth.basic]
+users = ["admin:$apr1$/BFDQS0a$cq.ZjOlxCYni/2xyqBCEg."]
+
+onDemand = false
+OnHostRule = true
+entryPoint = "http"
+
+[metrics]
+   [metrics.prometheus]
+   buckets=[0.1,0.3,1.2,5.0]
+   entryPoint = "traefik"
+
+[api]
+  dashboard = true
+  debug = true
+  [api.statistics]
+    recentErrors = 100

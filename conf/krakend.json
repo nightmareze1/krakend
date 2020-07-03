@@ -1,0 +1,208 @@
+{
+  "version": 2,
+  "extra_config": {
+    "github_com/devopsfaith/krakend-metrics": {
+      "collection_time": "60s",
+      "proxy_disabled": false,
+      "router_disabled": false,
+      "backend_disabled": false,
+      "endpoint_disabled": false,
+      "listen_address": ":8090"
+    },
+    "github_com/devopsfaith/krakend-gologging": {
+      "level":  "DEBUG",
+      "prefix": "[KRAKEND]",
+      "syslog": false,
+      "stdout": true
+    },
+    "github_com/devopsfaith/krakend-opencensus": {
+      "sample_rate": 100,
+      "reporting_period": 1,
+      "enabled_layers": {
+          "backend": true,
+          "router": true,
+          "proxy": true
+      },
+      "exporters": {
+        "prometheus": {
+            "port": 9091,
+            "namespace": "krakend",
+            "tag_host": true,
+            "tag_path": true,
+            "tag_endpoint": true,
+            "tag_method": true,
+            "tag_statuscode": true
+        }
+      }
+    }
+  },
+  "timeout": "3000ms",
+  "cache_ttl": "0s",
+  "output_encoding": "json",
+  "name": "krakend",
+  "port": 8080,
+  "endpoints": [
+    {
+          "endpoint": "/krakend/health-check",
+          "extra_config": {
+          "github.com/devopsfaith/krakend/proxy": {
+              "static": {
+              "data": {
+                  "status": "OK"
+              },
+              "strategy": "always"
+              }
+         }
+      },
+      "backend": [
+      {
+         "url_pattern": "/",
+         "host": [
+             "http://fake-backend"
+         ]
+      }
+      ]
+    },
+    {
+      "endpoint": "/api/app2",
+      "method": "GET",
+      "headers_to_pass": [ "*" ],
+      "querystring_params": [ "*" ],
+      "output_encoding": "no-op",
+      "extra_config": {},
+      "concurrent_calls": 1,
+      "backend": [
+        {
+          "url_pattern": "/api/app2/",
+          "headers_to_pass": [ "*" ],
+          "querystring_params": [ "*" ],
+          "encoding": "no-op",
+          "sd": "static",
+          "extra_config": {},
+          "method": "GET",
+          "host": ["http://kraken.perro"],
+          "extra_config": {
+              "github.com/devopsfaith/krakend/http": {
+                  "return_error_details": "backend_app2"
+              }
+          }
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/app1/",
+      "method": "GET",
+      "headers_to_pass": [ "*" ],
+      "querystring_params": [ "*" ],
+      "output_encoding": "no-op",
+      "extra_config": {},
+      "concurrent_calls": 1,
+      "backend": [
+        {
+          "url_pattern": "/",
+          "encoding": "no-op",
+          "sd": "static",
+          "method": "GET",
+          "host": ["http://kraken.gateway"],
+          "extra_config": {
+              "github.com/devopsfaith/krakend/http": {
+                  "return_error_details": "backend_app1"
+              }
+          }
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/app1/{level1}",
+      "method": "GET",
+      "headers_to_pass": [ "*" ],
+      "querystring_params": [ "*" ],
+      "output_encoding": "no-op",
+      "extra_config": {},
+      "concurrent_calls": 1,
+      "backend": [
+        {
+          "url_pattern": "/{level1}",
+          "encoding": "no-op",
+          "sd": "static",
+          "method": "GET",
+          "host": ["http://kraken.gateway"],
+          "extra_config": {
+              "github.com/devopsfaith/krakend/http": {
+                  "return_error_details": "backend_app1"
+              }
+          }
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/app1/{level1}/{level2}",
+      "method": "GET",
+      "headers_to_pass": [ "*" ],
+      "querystring_params": [ "*" ],
+      "output_encoding": "no-op",
+      "extra_config": {},
+      "concurrent_calls": 1,
+      "backend": [
+        {
+          "url_pattern": "/{level1}/{level2}",
+          "encoding": "no-op",
+          "sd": "static",
+          "method": "GET",
+          "host": ["http://kraken.gateway"],
+          "extra_config": {
+              "github.com/devopsfaith/krakend/http": {
+                  "return_error_details": "backend_app1"
+              }
+          }
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/app1/{level1}/{level2}/{level3}",
+      "method": "GET",
+      "headers_to_pass": [ "*" ],
+      "querystring_params": [ "*" ],
+      "output_encoding": "no-op",
+      "extra_config": {},
+      "concurrent_calls": 1,
+      "backend": [
+        {
+          "url_pattern": "/{level1}/{level2}/{level3}",
+          "encoding": "no-op",
+          "sd": "static",
+          "method": "GET",
+          "host": ["http://kraken.gateway"],
+          "extra_config": {
+              "github.com/devopsfaith/krakend/http": {
+                  "return_error_details": "backend_app1"
+              }
+          }
+        }
+      ]
+    },
+    {
+      "endpoint": "/api/app1/{level1}/{level2}/{level3}/{level4}",
+      "method": "GET",
+      "headers_to_pass": [ "*" ],
+      "querystring_params": [ "*" ],
+      "output_encoding": "no-op",
+      "extra_config": {},
+      "concurrent_calls": 1,
+      "backend": [
+        {
+          "url_pattern": "/{level1}/{level2}/{level3}/{level4}",
+          "encoding": "no-op",
+          "sd": "static",
+          "method": "GET",
+          "host": ["http://kraken.gateway"],
+          "extra_config": {
+              "github.com/devopsfaith/krakend/http": {
+                  "return_error_details": "backend_app1"
+              }
+          }
+        }
+      ]
+    }
+  ]
+}
