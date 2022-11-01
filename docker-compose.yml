@@ -1,27 +1,8 @@
 version: '3'
 
 services:
-  traefik:
-    image: traefik:v1.7.24-alpine
-    container_name: traefik
-    restart: always
-    command: --api --api.statistics --docker
-    ports:
-      - 80:80
-      - 443:443
-      - 8085:8080
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ./stack/traefik.toml:/etc/traefik/traefik.toml
-    networks:
-     traefik:
-       ipv4_address: 172.40.0.10
-
   krakend:
-#    build:
-#      context: ./
-#      dockerfile: Dockerfile
-    image: devopsfaith/krakend:config-watcher
+    image: devopsfaith/krakend
     labels:
       traefik.backend: 'krakend'
       traefik.frontend.rule: 'PathPrefix: /'
@@ -41,49 +22,12 @@ services:
       - 8090:8090
       - 9091:9091
 
-  designer:
-    image: devopsfaith/krakendesigner:latest
-    ports:
-      - 8787:80
-
   check:
     image: devopsfaith/krakend
     working_dir: /etc/krakend/
     command: check -c krakend.json
     volumes: 
       - ./conf:/etc/krakend
-
-
-  prometheus:
-    build:
-      context: ./stack/prometheus
-      dockerfile: Dockerfile
-    volumes:
-     - ./stack/config/prometheus.yml:/etc/prometheus/prometheus.yml
-    command: "--config.file=/etc/prometheus/prometheus.yml --storage.tsdb.path=/prometheus"
-    links:
-    - traefik
-    networks:
-     traefik:
-       ipv4_address: 172.40.0.90
-    ports:
-     - 9090:9090
-#
-  grafana:
-    image: grafana/grafana:latest
-    volumes:
-    # persistency
-    # grafana/data;sudo chown -R 472:472 grafana/data
-    - ./stack/grafana/data:/var/lib/grafana
-    env_file:
-    - ./stack/grafana/config.env 
-    links:
-    - prometheus
-    networks:
-     traefik:
-       ipv4_address: 172.40.0.100
-    ports:
-     - 3000:3000
 
   app2:
       hostname: app2
@@ -98,18 +42,6 @@ services:
       networks:
        traefik:
         ipv4_address: 172.40.0.21
-
-  app1:
-      hostname: app1
-      image: nightmareze1/nginx:v0.0.19
-      labels:
-        traefik.backend: 'app-1'
-        traefik.frontend.rule: 'Host: kraken.gateway ,PathStrip: /api/app1/'
-        traefik.enable: 'true'
-        traefik.port: '80'
-      networks:
-       traefik:
-        ipv4_address: 172.40.0.20
 
 networks:
  traefik:
